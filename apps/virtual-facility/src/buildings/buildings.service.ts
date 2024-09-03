@@ -1,16 +1,24 @@
 import { CreateWorkflowDto } from '@app/workflows';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateBuildingDto } from './dto/create-building.dto';
 import { UpdateBuildingDto } from './dto/update-building.dto';
 import { Building } from './entities/building.entity';
+import { ClientProxy } from '@nestjs/microservices';
+import { lastValueFrom } from 'rxjs';
+import { WORKFLOWS_SERVICE } from '../constants';
 
 @Injectable()
 export class BuildingsService {
   constructor(
     @InjectRepository(Building)
     private readonly buildingsRepository: Repository<Building>,
+    // ClientProxy это абстракция, прячушая
+    // выбраную нами стратегию транспортировки
+    // => нам не нужно менять код при сменя технологии траспорттровки
+    @Inject(WORKFLOWS_SERVICE)
+    private readonly workflowsServise: ClientProxy,
   ) {}
 
   async findAll(): Promise<Building[]> {
@@ -57,18 +65,14 @@ export class BuildingsService {
   }
 
   async createWorkflow(buildingId: number) {
-    console.log(
-      JSON.stringify({ name: 'My Workflow', buildingId } as CreateWorkflowDto),
-    );
-    const response = await fetch('http://workflows-service:3001/workflows', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: 'My Workflow',
-        buildingId,
+    // нужно исп. lastValueFrom т.к.
+    // workflowsServise.send возвращает Observable stram
+    const newWorkflow = await lastValueFrom(
+      this.workflowsServise.send('workflows.create', {
+        name: 'Workflow 1',
+        buildingId: buildingId,
       } as CreateWorkflowDto),
-    });
-    const newWorkflow = await response.json();
+    );
     console.log({ newWorkflow });
     return newWorkflow;
   }
