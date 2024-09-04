@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { WorkflowsServiceModule } from './workflows-service.module';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
@@ -9,13 +9,11 @@ async function bootstrap() {
 
   app.connectMicroservice<MicroserviceOptions>(
     {
-      transport: Transport.NATS,
+      transport: Transport.RMQ,
       options: {
-        servers: process.env.NATS_URL,
-        queue: 'workflows-service',
+        urls: [process.env.RABBITMQ_URL],
       },
     },
-    // !!!
     { inheritAppConfig: true },
   );
   await app.startAllMicroservices();

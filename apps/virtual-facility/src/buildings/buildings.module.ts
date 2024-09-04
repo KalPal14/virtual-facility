@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { BuildingsService } from './buildings.service';
-import { BuildingsController } from './buildings.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { BuildingsController } from './buildings.controller';
+import { BuildingsService } from './buildings.service';
 import { Building } from './entities/building.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { WORKFLOWS_SERVICE } from '../constants';
@@ -12,9 +12,9 @@ import { WORKFLOWS_SERVICE } from '../constants';
     ClientsModule.register([
       {
         name: WORKFLOWS_SERVICE,
-        transport: Transport.NATS,
+        transport: Transport.RMQ,
         options: {
-          servers: process.env.NATS_URL,
+          urls: [process.env.RABBITMQ_URL],
         },
       },
     ]),
