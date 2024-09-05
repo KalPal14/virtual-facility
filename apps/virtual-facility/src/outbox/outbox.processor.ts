@@ -18,6 +18,8 @@ export class OutboxProcessor {
     private readonly outboxRepository: Repository<Outbox>,
   ) {}
 
+  // !!! Cron всё равно нужно оставить
+  // это наша гарантия доставки сообшения "at least once"
   @Cron(CronExpression.EVERY_10_SECONDS)
   async processOutboxMessages() {
     this.logger.debug(`Processing outbox messages`);

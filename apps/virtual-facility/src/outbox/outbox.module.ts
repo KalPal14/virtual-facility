@@ -5,6 +5,7 @@ import { WORKFLOWS_SERVICE } from '../constants';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Outbox } from './entities/outbox.entity';
 import { OutboxProcessor } from './outbox.processor';
+import { OutboxEventSubscriber } from './outbox.event-subscriber';
 
 @Module({
   imports: [
@@ -20,7 +21,6 @@ import { OutboxProcessor } from './outbox.processor';
       },
     ]),
   ],
-  providers: [OutboxService, OutboxProcessor],
-  exports: [OutboxService, OutboxProcessor],
+  providers: [OutboxService, OutboxProcessor, OutboxEventSubscriber],
 })
 export class OutboxModule {}
