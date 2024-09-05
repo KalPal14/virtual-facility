@@ -5,10 +5,13 @@ import { BuildingsService } from './buildings.service';
 import { Building } from './entities/building.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { WORKFLOWS_SERVICE } from '../constants';
+import { OutboxModule } from '../outbox/outbox.module';
+import { Outbox } from '../outbox/entities/outbox.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Building]),
+    OutboxModule,
+    TypeOrmModule.forFeature([Building, Outbox]),
     ClientsModule.register([
       {
         name: WORKFLOWS_SERVICE,
