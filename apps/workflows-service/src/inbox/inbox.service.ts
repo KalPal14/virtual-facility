@@ -16,6 +16,10 @@ export class InboxService {
         where: { status: 'pending' },
         order: { createdAt: 'ASC' },
         take: options.take,
+        lock: {
+          mode: 'pessimistic_write',
+          onLocked: 'nowait',
+        },
       });
       await process(messages, manadger);
     });
